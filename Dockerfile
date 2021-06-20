@@ -14,6 +14,8 @@ RUN npm audit fix
 # Envrionment variables
 ENV NODE_ENV production
 
+CMD npm run build
+
 # Starting the pm2 process and keeping the docker container alive
 CMD NODE_ENV=production pm2 start process.yml -i max && tail -f /dev/null
 

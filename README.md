@@ -1,5 +1,5 @@
 # emiga-sss
-Shamir's secret sharing alogrithm implementation on Restful API
+Shamir's secret sharing algorithm implementation on Restful API
 
 ### Start
 via docker with the help of ```pm2```

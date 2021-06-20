@@ -1,7 +1,7 @@
 {
   "name": "emiga-sss",
   "version": "0.1.0",
-  "description": "Shamir's secret sharing alogrithm implementation on Restful API",
+  "description": "Shamir's secret sharing algorithm implementation on Restful API",
   "main": "build/main.js",
   "author": "Emin Muhammadi <muemin17631@sabah.edu.az>",
   "license": "MIT",
