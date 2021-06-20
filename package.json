@@ -4,7 +4,7 @@
   "description": "Shamir's secret sharing alogrithm implementation on Restful API",
   "main": "build/main.js",
   "author": "Emin Muhammadi <muemin17631@sabah.edu.az>",
-  "license": "ISC",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "start": "node .",
