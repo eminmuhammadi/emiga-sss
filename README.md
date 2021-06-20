@@ -25,5 +25,5 @@ yarn dev
 ## Join
 - POST
   - parts: []
-- http://localhost:3000/generate
+- http://localhost:3000/join
  
