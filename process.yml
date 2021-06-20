@@ -1,6 +1,6 @@
 apps:
     - script:  build/main.js
-      name: emiga-shamir
+      name: emiga-sss
       instances: 4
       exec_mode: cluster
       env:
