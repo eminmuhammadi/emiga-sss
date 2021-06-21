@@ -14,10 +14,8 @@ RUN npm audit fix
 # Envrionment variables
 ENV NODE_ENV production
 
-CMD npm run build
-
 # Starting the pm2 process and keeping the docker container alive
-CMD NODE_ENV=production pm2 start process.yml -i max && tail -f /dev/null
+CMD ["npm run build", "NODE_ENV=production pm2 start process.yml -i max && tail -f /dev/null"]
 
 # Exposing the RestAPI port
 EXPOSE 3000

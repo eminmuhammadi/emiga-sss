@@ -1,6 +1,6 @@
 {
   "name": "emiga-sss",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shamir's secret sharing algorithm implementation on Restful API",
   "main": "build/main.js",
   "author": "Emin Muhammadi <muemin17631@sabah.edu.az>",
@@ -26,12 +26,22 @@
     "@types/body-parser": "^1.19.0",
     "@types/node": "14.6.0",
     "body-parser": "^1.19.0",
+    "cluster": "^0.7.7",
+    "compression": "^1.7.4",
+    "connect-timeout": "^1.9.0",
+    "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "crypto": "^1.0.1",
+    "express-winston": "^4.1.0",
+    "helmet": "^4.6.0",
+    "morgan": "^1.10.0",
+    "os": "^0.1.1",
+    "path": "^0.12.7",
     "shamir": "^0.7.1",
     "ts-node": "9.0.0",
     "tslint": "6.1.3",
     "tslint-eslint-rules": "5.4.0",
-    "typescript": "4.0.2"
+    "typescript": "4.0.2",
+    "winston": "^3.3.3"
   }
 }

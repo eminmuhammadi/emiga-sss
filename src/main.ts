@@ -1,5 +1,15 @@
 import http from '0http';
 import bodyParser from 'body-parser';
+import helmet from 'helmet';
+import cors from "cors";
+import timeout from "connect-timeout";
+import compression from "compression";
+import morgan from "morgan";
+import winston from "winston";
+import expressWinston from "express-winston";
+import path from "path";
+import cluster from 'cluster';
+import os from 'os';
 import { generateParts, joinParts } from './lib/shamir';
 const { router, server } = http();
 
@@ -8,6 +18,37 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({
     extended: true
 }));
+router.use(helmet());
+router.use(cors());
+router.use(timeout());
+router.use(compression());
+
+/*
+|---------------------------
+| Logger
+|---------------------------
+*/
+router.use(morgan('combined'));
+router.use(expressWinston.logger({
+  transports: [
+    new winston.transports.File({
+      filename: path.join(__dirname, './../logs/router-error.log'),
+      level: 'error'
+    }),
+    new winston.transports.File({
+      filename: path.join(__dirname, './../logs/router-combined.log')
+    })
+  ],
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.json()
+  ),
+  meta: true,
+  msg: "{{res.statusCode}} HTTP {{req.method}} {{res.responseTime}}ms {{req.url}}",
+  expressFormat: true,
+  colorize: false
+}));
+
 
 /*
 |---------------------------
@@ -20,16 +61,19 @@ router.use(bodyParser.urlencoded({
 |---------------------------
 */
 router.post('/generate', (req: any, res: any) => {
+    res.setHeader('content-type', 'application/json');
+
     const p: any = generateParts(req.body.secret, req.body.parts, req.body.quorum);
-    const parts: Uint8Array[] = [];
+    const parts: any[] = [];
 
     for(let i=1; i<=req.body.parts; i++) {
-        parts.push(p[i]);
+      parts.push(Object.values(p[i]));
     }
 
-    res.setHeader('content-type', 'application/json');
     res.end(JSON.stringify({
-        parts
+      success: true,
+      message: 'Success',
+      parts
     }));
 });
 
@@ -47,11 +91,13 @@ router.post('/join', (req: any, res: any) => {
     const result = {};
 
     for(let i=0; i<(req.body.parts).length; i++) {
-        result[i+1] = new Uint8Array(Object.values(req.body.parts[i]));
+      result[i+1] = new Uint8Array(req.body.parts[i]);
     }
 
     res.end(JSON.stringify({
-        secret: joinParts(result),
+      success: true,
+      message: 'Success',
+      secret: joinParts(result),
     }));
 });
 
@@ -60,9 +106,13 @@ router.post('/join', (req: any, res: any) => {
 | Starting
 |---------------------------
 */
-server.listen(3000, '0.0.0.0', () => {
+if (cluster.isMaster) {
+  (os.cpus()).forEach(() => cluster.fork())
+} else {
+  server.listen(3000, '0.0.0.0', () => {
     console.log('Service has been started...');
-});
+  });
+}
 
 /*
 |---------------------------
