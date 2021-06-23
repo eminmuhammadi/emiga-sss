@@ -25,6 +25,29 @@ router.use(compression());
 
 /*
 |---------------------------
+| Error Handling
+|---------------------------
+*/
+const errorHandler = (err, _req, res) => {
+  res.setHeader('content-type', 'application/json');
+  res.statusCode = 500;
+  res.end(JSON.stringify({
+    success: false,
+    message: err.message,
+  }));
+};
+
+router.use('/', async (req, res, next) => {
+  try {
+    await next()
+  } catch (err) {
+    errorHandler(err, req, res)
+  }
+});
+
+
+/*
+|---------------------------
 | Logger
 |---------------------------
 */
@@ -61,8 +84,9 @@ router.use(expressWinston.logger({
 |---------------------------
 */
 router.post('/generate', (req: any, res: any) => {
-    res.setHeader('content-type', 'application/json');
+  res.setHeader('content-type', 'application/json');
 
+  try {
     const p: any = generateParts(req.body.secret, req.body.parts, req.body.quorum);
     const parts: any[] = [];
 
@@ -75,7 +99,11 @@ router.post('/generate', (req: any, res: any) => {
       message: 'Success',
       parts
     }));
+  } catch(err) {
+    errorHandler(err, req, res)
+  }
 });
+
 
 /*
 |---------------------------
@@ -86,20 +114,25 @@ router.post('/generate', (req: any, res: any) => {
 |---------------------------
 */
 router.post('/join', (req: any, res: any) => {
-    res.setHeader('content-type', 'application/json');
+  res.setHeader('content-type', 'application/json');
 
-    const result = {};
+  const result = {};
 
-    for(let i=0; i<(req.body.parts).length; i++) {
-      result[i+1] = new Uint8Array(req.body.parts[i]);
-    }
+  for(let i=0; i<(req.body.parts).length; i++) {
+    result[i+1] = new Uint8Array(req.body.parts[i]);
+  }
 
+  try {
     res.end(JSON.stringify({
       success: true,
       message: 'Success',
       secret: joinParts(result),
     }));
+  } catch(err) {
+    errorHandler(err, req, res)
+  }
 });
+
 
 /*
 |---------------------------
@@ -107,12 +140,13 @@ router.post('/join', (req: any, res: any) => {
 |---------------------------
 */
 if (cluster.isMaster) {
-  (os.cpus()).forEach(() => cluster.fork())
+  (os.cpus()).forEach(() => cluster.fork());
 } else {
   server.listen(3000, '0.0.0.0', () => {
     console.log('Service has been started...');
   });
 }
+
 
 /*
 |---------------------------
@@ -120,7 +154,7 @@ if (cluster.isMaster) {
 |---------------------------
 */
 process.on('SIGTERM', () => {
-    server.close(() => {
-        console.log('Service has been closed...');
-    });
+  server.close(() => {
+    console.log('Service has been closed...');
+  });
 });
